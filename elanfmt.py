@@ -337,7 +337,7 @@ if __name__ == "__main__":
 
     from optparse import OptionParser
 
-    usageStr = "USAGE: python elanfmt.py [PARAMETERS] [--input|-i INPUT_FILENAME] [--output|-o OUTPUT_FILENAME] DIRECTORY [FILTER_STRING]\n\n"+\
+    usageStr = "USAGE: %prog [PARAMETERS] [--input|-i INPUT_FILENAME] [--output|-o OUTPUT_FILENAME] DIRECTORY [FILTER_STRING]\n\n"+\
         "Filter String formatting:\n"+\
         "  Filter must follow the format 'category1:item1,item2,... category2:item1,item2,... ...'\n"+\
         "  - Categories and items must be separated by ':'\n"+\
@@ -352,7 +352,7 @@ if __name__ == "__main__":
         "    'word:1,3 phoneme:1,3'\n"+\
         "OVERALL EXAMPLE: \n"+\
         "  Extract timing for words 1 and 3 in the ELAN files in the current directory and merge with 'in.csv' to output file 'out.csv':\n"+\
-        "  - 'python elanfmt.py -i in.csv -o out.csv . words:1,3\n"+\
+        "  - '%prog -i in.csv -o out.csv . words:1,3\n"+\
         "-----------------\n"
     parser = OptionParser(usage=usageStr, epilog="Author: Andrew Wood <andywood@vt.edu>")
 
