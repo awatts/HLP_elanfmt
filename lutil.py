@@ -11,12 +11,6 @@
 # Rochester, NY
 #-------------------------------
 
-def listify(*item):
-    """
-    Simple wrapper function to convert a list of arguments into an actual list
-    """
-    return list(item)
-
 def flatten(lst):
     """
     String utility function to flatten an arbitrary nesting of lists into a single list

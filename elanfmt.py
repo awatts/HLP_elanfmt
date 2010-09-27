@@ -333,22 +333,11 @@ def elanfmt(root=".", filterin=None, infile=None, outfile=None, chkTranscript=Fa
 
 # Script Functions ---------------------------------
 
-def main():
-    """
-    Main method, contains the UI (command line arg processing). Run with parameter '-help' for usage.
-    """
+if __name__ == "__main__":
 
-    helpstring = \
-        "-----------------\n"+\
-        "elanfmt.py\n"+\
-        "-----------------\n"+\
-        "USAGE: python elanfmt.py [PARAMETERS] [--input|-i INPUT_FILENAME] [--output|-o OUTPUT_FILENAME] DIRECTORY [FILTER_STRING]\n\n"+\
-        "Command Line Options and Parameters:\n"+\
-        "  --help : print this string and exit\n"+\
-        "  --input or -i: specify an existing CSV file to merge output with\n"+\
-        "  --output or -o: specify a new file to write data to\n"+\
-        "  --transcript or -t: check transcript files for updated information\n"+\
-        "    NOTE: This is not implemented yet.\n\n"+\
+    from optparse import OptionParser
+
+    usageStr = "USAGE: python elanfmt.py [PARAMETERS] [--input|-i INPUT_FILENAME] [--output|-o OUTPUT_FILENAME] DIRECTORY [FILTER_STRING]\n\n"+\
         "Filter String formatting:\n"+\
         "  Filter must follow the format 'category1:item1,item2,... category2:item1,item2,... ...'\n"+\
         "  - Categories and items must be separated by ':'\n"+\
@@ -365,71 +354,28 @@ def main():
         "  Extract timing for words 1 and 3 in the ELAN files in the current directory and merge with 'in.csv' to output file 'out.csv':\n"+\
         "  - 'python elanfmt.py -i in.csv -o out.csv . words:1,3\n"+\
         "-----------------\n"
+    parser = OptionParser(usage=usageStr, epilog="Author: Andrew Wood <andywood@vt.edu>")
+
+    parser.add_option("-i", "--input", dest="fin",
+                      help="specify an existing CSV file to merge output with")
+    parser.add_option("-o", "--output", dest="fout",
+                      help="specify a new file to write data to")
+    parser.add_option("-t", "--transcript", action="store_true", dest="trans",
+                      default=False, help="check transcript files for updated"+\
+                              " information. NOTE: This is not implemented yet.")
+
+    (options, args) = parser.parse_args()
 
     path = "."
-    fout = None
-    fin = None
-    trans = False
+    filterstring = None
+    if len(args) > 0:
+        path = args[0]
+        if not os.path.isdir(path):
+            print "ERROR: ", path, " is not a valid directory."
+            sys.exit(1)
+    if len(args) == 2:
+        filterstring = args[1]
 
-    # do UI stuff
-    ignore = False
-    for i, arg in enumerate(sys.argv):
-        if ignore:
-            ignore = False
-            continue
-        elif arg == "" or i==0:
-            pass
-        elif arg == "--help":
-            print helpstring
-            sys.exit()
-        elif arg == "--output" or arg =="-o":
-            if (i+1) < len(sys.argv):
-                if not os.path.isdir(sys.argv[i+1]):
-                    fout = sys.argv[i+1]
-                    ignore = True
-                    continue
-                else:
-                    print "ERROR: cannot use the directory '",sys.argv[i+1],"' as the output file."
-            else:
-                print "ERROR: please specify an output file for option -o (--output)"
-            sys.exit()
-        elif arg == "--transcript":
-            trans = True
-        elif arg == "--input" or arg =="-i":
-            if (i+1) < len(sys.argv):
-                if os.path.isfile(sys.argv[i+1]):
-                    fin = sys.argv[i+1]
-                    if not fin.endswith(".csv"): print "WARNING: use of non-CSV files discouraged"
-                    ignore = True
-                    continue
-                else:
-                    print "ERROR: input argument '",sys.argv[i+1],"' is not a file"
-            else:
-                print "ERROR: please specify an input file for option -o (--output)"
-            sys.exit()
-        elif arg.startswith("-"):
-            for c in arg:
-                if c=='-':
-                    pass
-                elif c=='t':
-                    trans = True
-                elif c=="v":
-                    VERBOSE = True
-                elif c=='o' or c=='i':
-                    print "Ignoring option %s. It cannot be combined with other args, as it expects an input." % c
-                else:
-                    print "Unrecognized command %s: invoke command option '-help' for a list of valid commands" % c
-        else:
-            path = arg
-            if not os.path.isdir(path):
-                print "ERROR: ", path, " is not a valid directory."
-                sys.exit(1)
-
-            #print filterGen(sys.argv[i+1:])
-            print "infile:'{0}' outfile:'{1}'".format(fin, fout)
-            elanfmt(path, sys.argv[i+1:], fin, fout, trans)
-            break
-
-#determine if running as a script (as opposed to a module)
-if __name__ == "__main__":
-    main()
+    #print filterGen(sys.argv[i+1:])
+    print "\ninfile:'{0}'\noutfile:'{1}'".format(options.fin, options.fout)
+    elanfmt(path, filterstring, options.fin, options.fout, options.trans)
